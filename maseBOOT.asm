@@ -20,9 +20,9 @@ main:
 read_disk:
     mov     ah, 0x02            
     mov     al, 0x01             
-    int     0x13                
-    jc      read_disk
-    jc      disk_error            
+    int     0x13     
+    jc      disk_error           
+    jc      read_disk            
     mov     ax, 0x1000
     mov     ds, ax              
     mov     es, ax              
