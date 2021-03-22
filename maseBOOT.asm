@@ -8,7 +8,14 @@ main:
     mov     dh, 0x0            
     mov     dl, 0x0             
     mov     ch, 0x0             
-    mov     cl, 0x02            
+    mov     cl, 0x02
+    sti
+    mov     ax, 3
+    int     0x10
+    mov     si, boot_header
+    call    print
+    mov     si, boot_msg
+    call    print        
 
 read_disk:
     mov     ah, 0x02            
@@ -21,14 +28,7 @@ read_disk:
     mov     es, ax              
     mov     fs, ax              
     mov     gs, ax              
-    mov     ss, ax
-    sti
-    mov     ax, 3
-    int     0x10
-    mov     ah, 0x0e
-    mov     al, "$"
-    mov     bh, 0
-    int     0x10
+    mov     ss, ax 
     mov 	cx, 36
 
     .delay:
@@ -44,5 +44,35 @@ disk_error:
     int     0x10
     hlt    
 
+print:
+    pusha
+    mov     bx, 0x0007  
+    
+    print_loop:
+        mov     al, [si]
+        cmp     al, 0 
+        je      done
+        mov     ah, 0x0e 
+        int     0x10
+        inc     si       
+        jmp     print_loop
+    
+    done:
+        popa
+        ret
+
+print_nl:
+    pusha
+    mov  bh, 0       
+    mov  ax, 0x0e0d 
+    int  0x10
+    mov  ax, 0x0e0a 
+    int  0x10
+    popa
+    ret
+
+boot_header db "maseBOOT v0.0.1", 13, 10, 0
+boot_msg db "Booting...", 0
+
 times (510-($-$$)) db 0   
-dw 0xaa55               
+dw 0xaa55          
