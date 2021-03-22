@@ -5,11 +5,11 @@ A simple universal bootloader for 16bit kernels.
 
 ### How to build
 
-'''
+```
 nasm maseBOOT.asm -f bin -o maseBOOT.bin
 cat maseBOOT.bin 'YourKernel.bin' > OS16.bin
 sudo qemu-system-x86 -fda OS16.bin
-'''
+```
 
 Start  | End    | Type
 -------|--------|-------------
