@@ -4,9 +4,9 @@ bits 16
 main:
     sti
     mov     ax, 3
-    int     0x10 
+    int     0x10
     mov     bx, 0x1000          
-    mov     es, bx              
+    mov     es, bx       
     mov     bx, 0x0             
     mov     dh, 0x0            
     mov     dl, 0x0             
@@ -18,7 +18,9 @@ read_disk:
     mov     al, 0x01             
     int     0x13
     jc      read_disk
-    jmp     load_kernel
+    cmp     ah, 0
+    je      load_kernel
+    jne     disk_error
 
 load_kernel:
     mov 	ah, 06h
@@ -28,6 +30,8 @@ load_kernel:
     mov     bh, 0x0a
     int     0x10
     mov     si, boot_msg
+    call    print
+    mov     si, load_msg
     call    print        
     mov     ax, 0x1000
     mov     ds, ax              
@@ -42,6 +46,17 @@ load_kernel:
         loop 	.delay
 
     jmp     0x1000:0x0000
+
+disk_error:
+    mov 	ah, 06h
+	xor 	cx, cx
+	xor 	al, al
+	mov 	dx, 0x184F 
+    mov     bh, 0x04
+    int     0x10
+    mov     si, disk_error_msg
+    call    print
+    hlt
 
 print:
     pusha
@@ -70,7 +85,9 @@ print_nl:
     popa
     ret
 
-boot_msg db "Booting...", 0
+disk_error_msg db "Error Reading Disk.", 0
+boot_msg db "maseBOOT v0.0.1", 13, 10, 13, 10, 0
+load_msg db "Loading kernel...", 0
 
 times (510-($-$$)) db 0   
 dw 0xaa55          
